@@ -69,6 +69,7 @@ button.primary{font-weight:700}
 <button onclick="showTab('report',this)">月間レポート</button>
 <button onclick="showTab('annual',this)">年間分析</button>
 <button onclick="showTab('expenses',this)">支出入力</button>
+ <button onclick="showTab('income',this)">収入入力</button>
 <button onclick="showTab('goals',this)">貯金目標</button>
 <button onclick="showTab('subs',this)">サブスク</button>
 <button onclick="showTab('challenges',this)">節約チャレンジ</button>
@@ -186,6 +187,20 @@ button.primary{font-weight:700}
 </div>
 </div>
 
+ <div id="income" class="tab hidden">
+<div class="card">
+<h2>収入を追加</h2>
+<input id="incomeName" placeholder="内容（例：給料）">
+<input id="incomeAmount" type="number" placeholder="金額">
+<input id="incomeDate" type="date">
+<button class="primary" onclick="addIncome()">収入を保存</button>
+</div>
+<div class="card">
+<h2>収入履歴</h2>
+<div id="incomeList"></div>
+</div>
+</div>
+ 
 <div id="goals" class="tab hidden">
 <div class="card">
 <h2>🎯 貯金目標</h2>
@@ -268,6 +283,7 @@ let data = {
  budget:0,
  categoryBudgets:{},
  expenses:[],
+ incomes:[],
  goals:[],
  subs:[],
  payments:[],
@@ -378,6 +394,25 @@ function addExpense(){
 
  $("expName").value="";
  $("expAmount").value="";
+ save();
+}
+ function addIncome(){
+ const name=$("incomeName").value.trim();
+ const amount=Number($("incomeAmount").value);
+
+ if(!name||amount<=0){
+  return alert("内容と金額を入力してね");
+ }
+
+ data.incomes.unshift({
+  id:Date.now(),
+  name,
+  amount,
+  date:$("incomeDate").value||today()
+ });
+
+ $("incomeName").value="";
+ $("incomeAmount").value="";
  save();
 }
  const budgetCategories = [
@@ -639,6 +674,12 @@ function render(){
   .map(([k,v])=>`<div class="item"><span>${k}</span><b>${yen(v)}</b></div>`)
   .join("")||"まだ支出がないよ";
  renderCategoryBudgets();
+  $("incomeList").innerHTML=data.incomes.map(x=>
+  `<div class="item">
+   <span>${x.name}<br><small class="muted">${x.date}</small></span>
+   <b>${yen(x.amount)}</b>
+  </div>`
+ ).join("")||"まだ収入がないよ";
 
  $("recent").innerHTML=data.expenses.slice(0,8).map((x,i)=>
   `<div class="item"><span>${x.name}<br><small class="muted">${x.date}・${x.cat||"その他"}</small></span><b>${yen(x.amount)}</b></div>`
