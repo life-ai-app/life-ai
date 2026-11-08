@@ -761,16 +761,16 @@ $("incomeList").innerHTML=data.incomes.map((x,i)=>
 ).join("");
   const now=new Date();
  const year=now.getFullYear();
- const month=now.getMonth();
- const first=new Date(year,month,1).getDay();
- const last=new Date(year,month+1,0).getDate();
+ const calendarMonth=now.getMonth();
+ const first=new Date(year,calendarMonth,1).getDay();
+ const last=new Date(year,calendarMonth+1,0).getDate();
 
  let calendar="<div class='item'>日　月　火　水　木　金　土</div><div style='display:grid;grid-template-columns:repeat(7,1fr);gap:5px'>";
 
  for(let i=0;i<first;i++)calendar+="<div></div>";
 
  for(let day=1;day<=last;day++){
-  const date=year+"-"+String(month+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
+  const date=year+"-"+String(calendarmonth+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
   const pays=data.payments.filter(x=>x.date===date);
   const expenses=data.expenses.filter(x=>x.date===date);
   calendar+=`<div class="card" style="padding:5px;text-align:center;min-height:55px">
