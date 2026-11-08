@@ -363,9 +363,45 @@ async function loadData(){
  $("auth").classList.add("hidden");
  $("app").classList.remove("hidden");
  render();
-  await checkPremium();
+await checkSubscriptionExpenses();
+await checkPremium();
 }
 
+ async function checkSubscriptionExpenses(){
+ const now=new Date();
+ const month=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");
+ const lastDay=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+ const today=now.getDate();
+ let changed=false;
+
+ data.subs.forEach((sub,i)=>{
+  if(!sub.id){
+   sub.id=Date.now()+i;
+   changed=true;
+  }
+
+  const day=Math.min(Math.max(1,Number(sub.day)||1),lastDay);
+
+  if(today>=day&&sub.lastAddedMonth!==month){
+   const date=month+"-"+String(day).padStart(2,"0");
+
+   data.expenses.unshift({
+    id:Date.now()+i,
+    name:sub.name+"（サブスク）",
+    amount:Number(sub.amount),
+    cat:"サブスク",
+    date,
+    subscriptionId:sub.id
+   });
+
+   sub.lastAddedMonth=month;
+   changed=true;
+  }
+ });
+
+ if(changed)await save();
+}
+ 
 async function save(){
  if(!user)return;
  const {error}=await sb.from("life_data").upsert({
