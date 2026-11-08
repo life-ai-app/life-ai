@@ -711,13 +711,14 @@ $("forecastBalance").textContent=yen(forecast);
   .map(([k,v])=>`<div class="item"><span>${k}</span><b>${yen(v)}</b></div>`)
   .join("")||"まだ支出がないよ";
  renderCategoryBudgets();
-  $("incomeList").innerHTML=data.incomes.map(x=>
-  `<div class="item">
-   <span>${x.name}<br><small class="muted">${x.date}</small></span>
-   <b>${yen(x.amount)}</b>
-  </div>`
- ).join("")||"まだ収入がないよ";
 
+$("incomeList").innerHTML=data.incomes.map((x,i)=>
+ `<div class="item">
+  <span>${x.name}<br><small class="muted">${x.date}</small></span>
+  <b>${yen(x.amount)}</b>
+  <button onclick="removeItem('incomes',${i})">削除</button>
+ </div>`
+).join("")||"まだ収入がないよ";
  $("recent").innerHTML=data.expenses.slice(0,8).map((x,i)=>
   `<div class="item"><span>${x.name}<br><small class="muted">${x.date}・${x.cat||"その他"}</small></span><b>${yen(x.amount)}</b></div>`
  ).join("")||"支出を追加してね";
