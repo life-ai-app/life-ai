@@ -80,6 +80,8 @@ button.primary{font-weight:700}
 <div class="card">
 <h2>今月のカテゴリ別支出</h2>
 <div id="categories"></div>
+ <h3>カテゴリ別予算設定</h3>
+<div id="categoryBudgetList"></div>
 </div>
 <div class="card">
 <h2>節約アドバイス</h2>
@@ -264,6 +266,7 @@ let user = null;
 let isPremium = false;
 let data = {
  budget:0,
+ categoryBudgets:{},
  expenses:[],
  goals:[],
  subs:[],
@@ -375,6 +378,48 @@ function addExpense(){
 
  $("expName").value="";
  $("expAmount").value="";
+ save();
+}
+ const budgetCategories = [
+ "食費","住居","日用品","交通","通信",
+ "趣味・娯楽","買い物","美容・健康","交際費","その他"
+];
+
+function renderCategoryBudgets(){
+ const el=$("categoryBudgetList");
+ if(!el)return;
+
+ const month=today().slice(0,7);
+
+ el.innerHTML=budgetCategories.map(cat=>{
+  const amount=Number(data.categoryBudgets[cat])||0;
+  const spent=data.expenses
+   .filter(x=>(x.date||"").startsWith(month)&&(x.cat||"その他")===cat)
+   .reduce((s,x)=>s+(Number(x.amount)||0),0);
+
+  const rate=amount>0?spent/amount*100:0;
+  const status=amount===0?"予算未設定":
+   rate>=100?"予算オーバー！":
+   rate>=80?"予算の80%を超えたよ":
+   "予算内";
+
+  return `<div class="item">
+   <div style="flex:1">
+    <b>${cat}</b>
+    <div class="muted">使用 ${yen(spent)} / 予算 ${yen(amount)}</div>
+    <div class="muted">${status}</div>
+   </div>
+   <input type="number" min="0" placeholder="予算（円）"
+    style="width:120px"
+    value="${amount||""}"
+    onchange="saveCategoryBudget('${cat}',this.value)">
+  </div>`;
+ }).join("");
+}
+function saveCategoryBudget(cat,value){
+ const amount=Number(value);
+ if(amount<0||!Number.isFinite(amount))return;
+ data.categoryBudgets[cat]=amount;
  save();
 }
 
@@ -593,6 +638,7 @@ function render(){
   .sort((a,b)=>b[1]-a[1])
   .map(([k,v])=>`<div class="item"><span>${k}</span><b>${yen(v)}</b></div>`)
   .join("")||"まだ支出がないよ";
+ renderCategoryBudgets();
 
  $("recent").innerHTML=data.expenses.slice(0,8).map((x,i)=>
   `<div class="item"><span>${x.name}<br><small class="muted">${x.date}・${x.cat||"その他"}</small></span><b>${yen(x.amount)}</b></div>`
