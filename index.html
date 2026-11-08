@@ -256,6 +256,9 @@ button.primary{font-weight:700}
 <div id="payments" class="tab hidden">
 <div class="card">
 <h2>支払予定</h2>
+<h3>今月の支払い済み合計</h3>
+<div id="paidPaymentTotal">0円</div>
+<div id="paymentCalendar"></div>
 <input id="payName" placeholder="支払い内容">
 <div class="row">
 <input id="payAmount" type="number" placeholder="金額">
@@ -543,6 +546,11 @@ function addPayment(){
  $("payAmount").value="";
  save();
 }
+ 
+function togglePayment(index){
+ data.payments[index].paid=!data.payments[index].paid;
+ save();
+}
 
 function saveBudget(){
  data.budget=+$("budget").value||0;
@@ -674,6 +682,11 @@ function render(){
  const month=today().slice(0,7);
  const ex=data.expenses.filter(x=>(x.date||"").startsWith(month));
  const total=ex.reduce((s,x)=>s+(Number(x.amount)||0),0);
+ const paidTotal=data.payments
+ .filter(x=>x.paid&&(x.date||"").startsWith(month))
+ .reduce((s,x)=>s+(Number(x.amount)||0),0);
+
+$("paidPaymentTotal").textContent=yen(paidTotal);
 const incomeTotal=data.incomes
  .filter(x=>(x.date||"").startsWith(month))
  .reduce((s,x)=>s+(Number(x.amount)||0),0);
@@ -738,8 +751,36 @@ $("incomeList").innerHTML=data.incomes.map((x,i)=>
  ).join("");
 
  $("payList").innerHTML=data.payments.map((x,i)=>
-  `<div class="item"><span>${x.name}<br><small>${x.date}</small></span><b>${yen(x.amount)}</b><button onclick="removeItem('payments',${i})">削除</button></div>`
- ).join("");
+ `<div class="item">
+  <span>${x.name}<br><small>${x.date}</small>
+  <br><small>${x.paid?"支払い済み":"未払い"}</small></span>
+  <b>${yen(x.amount)}</b>
+  <button onclick="togglePayment(${i})">${x.paid?"未払いに戻す":"支払い済み"}</button>
+  <button onclick="removeItem('payments',${i})">削除</button>
+ </div>`
+).join("");
+  const now=new Date();
+ const year=now.getFullYear();
+ const month=now.getMonth();
+ const first=new Date(year,month,1).getDay();
+ const last=new Date(year,month+1,0).getDate();
+
+ let calendar="<div class='item'>日　月　火　水　木　金　土</div><div style='display:grid;grid-template-columns:repeat(7,1fr);gap:5px'>";
+
+ for(let i=0;i<first;i++)calendar+="<div></div>";
+
+ for(let day=1;day<=last;day++){
+  const date=year+"-"+String(month+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
+  const pays=data.payments.filter(x=>x.date===date);
+  const expenses=data.expenses.filter(x=>x.date===date);
+  calendar+=`<div class="card" style="padding:5px;text-align:center;min-height:55px">
+   <b>${day}</b>
+   ${pays.map(x=>`<small style="display:block;color:#d97706">${x.name}</small>`).join("")}
+   ${expenses.map(x=>`<small style="display:block;color:#2563eb">支出:${x.name}</small>`).join("")}
+  </div>`;
+ }
+ calendar+="</div>";
+ $("paymentCalendar").innerHTML=calendar;
 
  const challenges=["今週はコンビニを控える","外食を1回減らす","使っていないサブスクを見直す"];
  $("challengeList").innerHTML=challenges.map((x,i)=>
