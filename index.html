@@ -733,7 +733,7 @@ const forecast=incomeTotal-(total/days*lastDay);
  $("incomeTotal").textContent=yen(incomeTotal);
 $("expenseTotal").textContent=yen(total);
 $("currentBalance").textContent=yen(balance);
-$("forecastBalance").textContent=yen(forecast);
+$("forecastBalance").textContent=yen(Math.round(forecast));
  $("total").textContent=yen(total);
  $("budgetText").textContent=data.budget
   ?`予算 ${yen(data.budget)} / 残り ${yen(data.budget-total)}`
