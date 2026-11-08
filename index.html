@@ -79,6 +79,26 @@ button.primary{font-weight:700}
 
 <div id="home" class="tab">
 <div class="card">
+<h2>💰 今月の収支・月末予測</h2>
+<div class="item">
+<span>今月の収入</span>
+<b id="incomeTotal">0円</b>
+</div>
+<div class="item">
+<span>今月の支出</span>
+<b id="expenseTotal">0円</b>
+</div>
+<div class="item">
+<span>現在の収支</span>
+<b id="currentBalance">0円</b>
+</div>
+<div class="item">
+<span>月末の予測収支</span>
+<b id="forecastBalance">0円</b>
+</div>
+<p class="muted">今月の収入と、現在までの支出ペースから予測します。</p>
+</div>
+ <div class="card">
 <h2>今月のカテゴリ別支出</h2>
 <div id="categories"></div>
  <h3>カテゴリ別予算設定</h3>
@@ -654,7 +674,24 @@ function render(){
  const month=today().slice(0,7);
  const ex=data.expenses.filter(x=>(x.date||"").startsWith(month));
  const total=ex.reduce((s,x)=>s+(Number(x.amount)||0),0);
+const incomeTotal=data.incomes
+ .filter(x=>(x.date||"").startsWith(month))
+ .reduce((s,x)=>s+(Number(x.amount)||0),0);
 
+const balance=incomeTotal-total;
+
+const days=new Date().getDate();
+const lastDay=new Date(
+ new Date().getFullYear(),
+ new Date().getMonth()+1,
+ 0
+).getDate();
+
+const forecast=incomeTotal-(total/days*lastDay);
+ $("incomeTotal").textContent=yen(incomeTotal);
+$("expenseTotal").textContent=yen(total);
+$("currentBalance").textContent=yen(balance);
+$("forecastBalance").textContent=yen(forecast);
  $("total").textContent=yen(total);
  $("budgetText").textContent=data.budget
   ?`予算 ${yen(data.budget)} / 残り ${yen(data.budget-total)}`
