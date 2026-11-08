@@ -194,6 +194,8 @@ button.primary{font-weight:700}
 <hr>
 <h2>支出を追加</h2>
 <input id="expName" placeholder="内容（例：スーパー）">
+ <button type="button" onclick="document.getElementById('receiptImage').click()">📸 レシートを撮影・選択</button>
+<input type="file" id="receiptImage" accept="image/*" capture="environment" style="display:none">
 <div class="row">
 <input id="expAmount" type="number" placeholder="金額">
 <select id="expCat">
@@ -918,5 +920,37 @@ async function startPremium() {
   |
   <a href="law.html" target="_blank">特定商取引法に基づく表記</a>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+document.getElementById("receiptImage").addEventListener("change",async function(e){
+ const file=e.target.files[0];
+ if(!file)return;
+
+ try{
+  alert("レシートを読み取っています。少し待ってね！");
+  const result=await Tesseract.recognize(file,"jpn");
+  const text=result.data.text;
+  const lines=text.split("\n").map(x=>x.trim()).filter(Boolean);
+
+  const totalLine=lines.find(x=>/合計|総合計|お買上げ|お支払/.test(x));
+  const amountMatch=totalLine&&totalLine.match(/[\d,]+/g);
+
+  if(amountMatch){
+   $("expAmount").value=Number(amountMatch[amountMatch.length-1].replace(/,/g,""));
+  }
+
+  if(lines.length){
+   $("expName").value=lines[0];
+  }
+
+  alert("読み取り完了！内容と金額を確認して登録してね。");
+ }catch(error){
+  alert("読み取りに失敗したよ。もう一度撮影してね。");
+  console.error(error);
+ }
+
+ this.value="";
+});
+</script>
 </body>
 </html>
