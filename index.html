@@ -770,7 +770,7 @@ $("incomeList").innerHTML=data.incomes.map((x,i)=>
  for(let i=0;i<first;i++)calendar+="<div></div>";
 
  for(let day=1;day<=last;day++){
-  const date=year+"-"+String(calendarmonth+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
+  const date=year+"-"+String(calendarMonth+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
   const pays=data.payments.filter(x=>x.date===date);
   const expenses=data.expenses.filter(x=>x.date===date);
   calendar+=`<div class="card" style="padding:5px;text-align:center;min-height:55px">
