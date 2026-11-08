@@ -72,7 +72,6 @@ button.primary{font-weight:700}
  <button onclick="showTab('income',this)">収入入力</button>
 <button onclick="showTab('goals',this)">貯金目標</button>
 <button onclick="showTab('subs',this)">サブスク</button>
-<button onclick="showTab('challenges',this)">節約チャレンジ</button>
 <button onclick="showTab('payments',this)">支払予定</button>
 <button onclick="showTab('settings',this)">設定</button>
 </nav>
@@ -244,14 +243,6 @@ button.primary{font-weight:700}
 </div>
 <button class="primary" onclick="addSub()">登録</button>
 <div id="subList"></div>
-</div>
-</div>
-
-<div id="challenges" class="tab hidden">
-<div class="card">
-<h2>節約チャレンジ</h2>
-<p>今週の節約に挑戦しよう！</p>
-<div id="challengeList"></div>
 </div>
 </div>
 
@@ -783,11 +774,6 @@ ${expenses.map(x=>`<small style="display:block;color:#2563eb">${x.name} ${yen(x.
  }
  calendar+="</div>";
  $("paymentCalendar").innerHTML=calendar;
-
- const challenges=["今週はコンビニを控える","外食を1回減らす","使っていないサブスクを見直す"];
- $("challengeList").innerHTML=challenges.map((x,i)=>
-  `<label class="item"><span>${x}</span><input type="checkbox" style="width:auto" ${data.challenges[i]?"checked":""} onchange="data.challenges[${i}]=this.checked;save()"></label>`
- ).join("");
 
  renderReport();
  renderAnnual();
