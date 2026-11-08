@@ -682,7 +682,7 @@ function render(){
  const month=today().slice(0,7);
  const ex=data.expenses.filter(x=>(x.date||"").startsWith(month));
  const total=ex.reduce((s,x)=>s+(Number(x.amount)||0),0);
- const paidTotal=data.payments
+ const paidTotal=total+data.payments
  .filter(x=>x.paid&&(x.date||"").startsWith(month))
  .reduce((s,x)=>s+(Number(x.amount)||0),0);
 
@@ -775,8 +775,8 @@ $("incomeList").innerHTML=data.incomes.map((x,i)=>
   const expenses=data.expenses.filter(x=>x.date===date);
   calendar+=`<div class="card" style="padding:5px;text-align:center;min-height:55px">
    <b>${day}</b>
-   ${pays.map(x=>`<small style="display:block;color:${x.paid?"#16a34a":"#d97706"}">${x.name}${x.paid?" ✓":""}</small>`).join("")}
-   ${expenses.map(x=>`<small style="display:block;color:#2563eb">支出:${x.name}</small>`).join("")}
+   ${pays.map(x=>`<small style="display:block;color:${x.paid?"#16a34a":"#d97706"}">${x.name} ${yen(x.amount)}${x.paid?" ✓":""}</small>`).join("")}
+${expenses.map(x=>`<small style="display:block;color:#2563eb">${x.name} ${yen(x.amount)}</small>`).join("")}
   </div>`;
  }
  calendar+="</div>";
