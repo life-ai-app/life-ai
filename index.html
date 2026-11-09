@@ -317,13 +317,18 @@ $("annualYear").value=new Date().getFullYear();
 
 function msg(t){$("authMsg").textContent=t}
 
+
 async function signUp(){
  const {error}=await sb.auth.signUp({
   email:$("email").value,
-  password:$("password").value
+  password:$("password").value,
+  options:{
+   emailRedirectTo:"https://life-ai-app.github.io/life-ai/"
+  }
  });
  msg(error?error.message:"登録メールを確認してください。");
 }
+
 
 async function signIn(){
  const {data:d,error}=await sb.auth.signInWithPassword({
