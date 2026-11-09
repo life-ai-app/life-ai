@@ -270,6 +270,7 @@ button.primary{font-weight:700}
 <button class="primary" onclick="saveBudget()">予算を保存</button>
 <p id="saveMsg" class="muted"></p>
 <button onclick="signOut()">ログアウト</button>
+<button onclick="deleteAccount()" style="background:#dc3545;color:white">アカウントを削除</button>
 </div>
 </div>
 
@@ -344,6 +345,23 @@ async function signOut(){
  user=null;
  $("auth").classList.remove("hidden");
  $("app").classList.add("hidden");
+}
+
+ async function deleteAccount(){
+ if(!confirm("アカウントと保存データをすべて削除しますか？この操作は取り消せません。"))return;
+
+ const {data:{session}}=await sb.auth.getSession();
+ if(!session)return alert("ログインしてください。");
+
+ const {error}=await sb.functions.invoke("delete-account",{
+  body:{}
+ });
+
+ if(error)return alert("削除できませんでした。");
+
+ alert("アカウントを削除しました。");
+ await sb.auth.signOut();
+ location.reload();
 }
 
 async function loadData(){
