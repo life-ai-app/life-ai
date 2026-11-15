@@ -714,7 +714,7 @@ if (!isPremium) {
 
   } catch(error) {
    console.error("Gemini advice error:",error);
-   $("savingAdvice").textContent = "AIアドバイスを取得できませんでした。時間をおいて再度お試しください。";
+      $("savingAdvice").textContent = "エラー内容：" + error.message;
   }
  })();
 }
