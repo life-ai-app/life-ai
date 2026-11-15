@@ -702,6 +702,7 @@ if (!isPremium) {
    }
 
    const advice =
+    result.answer ||
     result.advice ||
     result.text ||
     result.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("\n");
