@@ -68,7 +68,7 @@ button.primary{font-weight:700}
 <button class="active" onclick="showTab('home',this)">ホーム</button>
 <button onclick="showTab('report',this)">月間レポート</button>
 <button onclick="showTab('annual',this)">年間分析</button>
- <button onclick="showTab('budget',this)">予算</button>
+ <button onclick="showTab('budgetTab',this)">予算</button>
 <button onclick="showTab('expenses',this)">支出入力</button>
  <button onclick="showTab('income',this)">収入入力</button>
 <button onclick="showTab('goals',this)">貯金目標</button>
@@ -77,18 +77,21 @@ button.primary{font-weight:700}
 <button onclick="showTab('settings',this)">設定</button>
 </nav>
 
- <div id="budget" class="tab hidden">
+ <div id="budgetTab" class="tab hidden">
  <div class="card">
   <h2>💰 予算管理</h2>
   <h3>今月の総予算</h3>
-  <input id="budget" type="number" placeholder="例：150000">
+  <input id="monthlyBudget" type="number" placeholder="例：150000">
   <button class="primary" onclick="saveBudget()">予算を保存</button>
   <p id="saveMsg" class="muted"></p>
  </div>
- <div class="card">
- </div>
+<div class="card">
+  <h3>カテゴリ別予算設定</h3>
+  <div id="categoryBudgetList"></div>
+</div>
 </div>
  
+ <div id="home" class="tab">
 <div class="card" style="padding:20px">
   <h2>💰 今月のお金の状況</h2>
 
@@ -117,8 +120,6 @@ button.primary{font-weight:700}
  <div class="card">
 <h2>今月のカテゴリ別支出</h2>
 <div id="categories"></div>
- <h3>カテゴリ別予算設定</h3>
-<div id="categoryBudgetList"></div>
 </div>
 <div class="card">
 <h2>節約アドバイス</h2>
@@ -308,7 +309,6 @@ button.primary{font-weight:700}
 <div id="settings" class="tab hidden">
 <div class="card">
 
-<p id="saveMsg" class="muted"></p>
 <button onclick="signOut()">ログアウト</button>
 <button onclick="deleteAccount()" style="background:#dc3545;color:white">アカウントを削除</button>
 </div>
@@ -645,7 +645,7 @@ function togglePayment(index){
 }
 
 function saveBudget(){
- data.budget=+$("budget").value||0;
+ data.budget=+$("monthlyBudget").value||0;
  save();
  $("saveMsg").textContent="予算を保存したよ！";
 }
@@ -904,7 +904,7 @@ $("forecastBalance").textContent=yen(Math.round(forecast));
  $("budgetBar").style.width=data.budget
   ?Math.min(100,total/data.budget*100)+"%"
   :"0%";
- $("budget").value=data.budget||"";
+ $("monthlyBudget").value=data.budget||"";
 
  const sums={};
  ex.forEach(x=>{
