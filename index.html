@@ -946,44 +946,45 @@ sb.auth.getSession().then(({data:d})=>{
   loadData();
  }
 });
- async function checkPremium() {
-  $("premiumStatus").textContent = "① プレミアム確認を開始";
-if (!user) return;
+async function checkPremium() {
+  $("premiumStatus").textContent = "会員状態を確認中...";
 
-  const { data: sub, error } = await sb
-    .from("subscriptions")
-    .select("status,current_period_end")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  try {
+    if (!user) {
+      $("premiumStatus").textContent = "ログイン情報がありません";
+      return;
+    }
 
-console.log("会員情報取得結果:", sub, error);
-  $("premiumStatus").textContent =
- error ? "取得エラー：" + error.message :
- "取得成功：" + JSON.stringify(sub);
+    const { data: sub, error } = await sb
+      .from("subscriptions")
+      .select("status,current_period_end")
+      .eq("user_id", user.id)
+      .maybeSingle();
 
-  if (error) {
-    $("premiumStatus").textContent = "会員状態を確認できませんでした";
-    return;
-  }
+    if (error) throw error;
 
-  const active = sub &&
-    ["active", "trialing"].includes(sub.status) &&
-    (!sub.current_period_end ||
-      new Date(sub.current_period_end) > new Date());
+    const active = sub &&
+      ["active", "trialing"].includes(sub.status) &&
+      (!sub.current_period_end ||
+        new Date(sub.current_period_end) > new Date());
 
-  isPremium = !!active;
-  console.log("Premium確認:", {sub, active, isPremium});
+    isPremium = !!active;
 
-  if (active) {
-    $("premiumStatus").textContent = "✨ プレミアム会員です";
-    $("premiumButton").textContent = "プレミアム会員";
-    $("premiumButton").disabled = true;
-    $("portalButton").style.display = "block";
-  } else {
-    $("premiumStatus").textContent = "現在は無料プランです";
-    $("premiumButton").textContent = "プレミアムを始める";
-    $("premiumButton").disabled = false;
-    $("portalButton").style.display = "none";
+    if (active) {
+      $("premiumStatus").textContent = "✨ プレミアム会員です";
+      $("premiumButton").textContent = "プレミアム会員";
+      $("premiumButton").disabled = true;
+      $("portalButton").style.display = "block";
+    } else {
+      $("premiumStatus").textContent = "現在は無料プランです";
+      $("premiumButton").textContent = "プレミアムを始める";
+      $("premiumButton").disabled = false;
+      $("portalButton").style.display = "none";
+    }
+
+  } catch (error) {
+    console.error("Premium確認エラー:", error);
+    $("premiumStatus").textContent = "確認エラー：" + error.message;
   }
 }
 async function startPremium() {
