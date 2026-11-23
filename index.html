@@ -902,10 +902,62 @@ $("forecastBalance").textContent=yen(Math.round(forecast));
   const cat=x.cat||"その他";
   sums[cat]=(sums[cat]||0)+(Number(x.amount)||0);
  });
- $("categories").innerHTML=Object.entries(sums)
-  .sort((a,b)=>b[1]-a[1])
-  .map(([k,v])=>`<div class="item"><span>${k}</span><b>${yen(v)}</b></div>`)
-  .join("")||"まだ支出がないよ";
+
+const entries = Object.entries(sums)
+ .filter(([k,v]) => v > 0)
+ .sort((a,b) => b[1] - a[1]);
+
+const total = entries.reduce((s,[k,v]) => s + v, 0);
+
+if (!total) {
+ $("categories").innerHTML = "まだ支出がないよ";
+} else {
+ const colors = [
+  "#7057e8","#36A6D9","#F3A64A","#42B883",
+  "#E879A8","#8B9CF6","#D9A441","#56B6A8",
+  "#A78BFA","#A0A0B0"
+ ];
+
+ let current = 0;
+ const gradient = entries.map(([k,v],i) => {
+  const start = current;
+  current += v / total * 100;
+  return `${colors[i % colors.length]} ${start}% ${current}%`;
+ }).join(",");
+
+ $("categories").innerHTML = `
+  <div style="text-align:center;margin:15px 0">
+   <div style="font-size:13px;color:#888">今月の支出合計</div>
+   <div style="font-size:26px;font-weight:800;color:#7057e8">
+    ${yen(total)}
+   </div>
+   <div style="width:190px;height:190px;border-radius:50%;
+    background:conic-gradient(${gradient});
+    margin:18px auto;position:relative">
+    <div style="position:absolute;inset:38px;background:white;
+     border-radius:50%"></div>
+   </div>
+  </div>
+  ${entries.map(([k,v],i) => {
+   const rate = v / total * 100;
+   return `
+    <div style="margin:14px 0">
+     <div class="item">
+      <span>
+       <span style="color:${colors[i % colors.length]}">●</span>
+       ${k}
+      </span>
+      <b>${yen(v)}（${rate.toFixed(1)}%）</b>
+     </div>
+     <div style="height:7px;background:#eee;border-radius:10px;overflow:hidden">
+      <div style="height:100%;width:${rate}%;
+       background:${colors[i % colors.length]}"></div>
+     </div>
+    </div>`;
+  }).join("")}
+ `;
+}
+
  renderCategoryBudgets();
 
 $("incomeList").innerHTML=data.incomes.map((x,i)=>
