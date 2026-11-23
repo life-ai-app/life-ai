@@ -966,6 +966,7 @@ sb.auth.getSession().then(({data:d})=>{
       new Date(sub.current_period_end) > new Date());
 
   isPremium = !!active;
+  console.log("Premium確認:", {sub, active, isPremium});
 
   if (active) {
     $("premiumStatus").textContent = "✨ プレミアム会員です";
