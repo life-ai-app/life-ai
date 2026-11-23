@@ -956,6 +956,9 @@ sb.auth.getSession().then(({data:d})=>{
     .maybeSingle();
 
 console.log("会員情報取得結果:", sub, error);
+  $("premiumStatus").textContent =
+ error ? "取得エラー：" + error.message :
+ "取得成功：" + JSON.stringify(sub);
 
   if (error) {
     $("premiumStatus").textContent = "会員状態を確認できませんでした";
