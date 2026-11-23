@@ -662,63 +662,11 @@ function renderReport(){
   <b style="font-size:12px;text-align:right">${yen(x.value)}</b>
   </div>`
  ).join("");
-if (!isPremium) {
- $("savingAdvice").textContent =
-  "🔒 節約アドバイス強化はプレミアム会員限定です。月額300円で利用できます！";
-} else {
- $("savingAdvice").textContent = "AIが節約アドバイスを考えています...";
+$("savingAdvice").textContent =
+ "診断ボタンを押すと、AIが家計を分析します。";
 
- (async () => {
-  try {
-   const { data: sessionData } = await sb.auth.getSession();
-   const accessToken = sessionData.session?.access_token;
-
-   if (!accessToken) {
-    throw new Error("ログイン情報を取得できませんでした。");
-   }
-
-   const top3 = cats.slice(0,3);
-   const question = `支出カテゴリと金額：${
-    top3.map(([name,value]) => `${name}：${value}円`).join("、") || "まだ支出記録なし"
-   }。この支出を分析して、具体的で無理のない節約アドバイスを3つ、日本語で提案してください。`;
-
-   const response = await fetch(
-    SUPABASE_URL + "/functions/v1/gemini-adcice",
-    {
-     method:"POST",
-     headers:{
-      "Content-Type":"application/json",
-      "Authorization":"Bearer " + accessToken,
-      "apikey":SUPABASE_ANON_KEY
-     },
-     body:JSON.stringify({question})
-    }
-   );
-
-   const result = await response.json();
-
-   if (!response.ok) {
-    throw new Error(result.error || result.message || "AIとの通信に失敗しました。");
-   }
-
-   const advice =
-    result.answer ||
-    result.advice ||
-    result.text ||
-    result.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("\n");
-
-   if (!advice) {
-    throw new Error("AIの回答を取得できませんでした。");
-   }
-
-   $("savingAdvice").textContent = advice;
-
-  } catch(error) {
-   console.error("Gemini advice error:",error);
-      $("savingAdvice").textContent = "エラー内容：" + error.message;
-  }
- })();
-}
+$("diagnosisScore").textContent = "--点";
+$("diagnosisGrade").textContent = "診断前";
 }
 
 function renderAnnual(){
@@ -758,6 +706,130 @@ $("annualMonths").innerHTML=monthly.map((amount,i)=>`
    `<div class="item"><span>${i+1}位　${name}</span><b>${yen(amount)}</b></div>`
   ).join("")
   :"この年の支出データはまだないよ。";
+}
+async function runDiagnosis(){
+
+ const button=$("diagnosisButton");
+ const output=$("savingAdvice");
+
+ if(!isPremium){
+  output.textContent="🔒 AI家計診断はプレミアム会員限定です。月額300円で利用できます！";
+  return;
+ }
+
+ button.disabled=true;
+ button.textContent="診断中...";
+ output.textContent="AIが家計を詳しく分析しています...";
+ $("diagnosisScore").textContent="分析中";
+ $("diagnosisGrade").textContent="しばらくお待ちください";
+
+ try{
+  const selected=$("reportMonth").value||today().slice(0,7);
+  const rows=data.expenses.filter(x=>(x.date||"").startsWith(selected));
+  const total=rows.reduce((s,x)=>s+(Number(x.amount)||0),0);
+
+  const prevDate=new Date(Number(selected.slice(0,4)),Number(selected.slice(5,7))-2,1);
+  const prevKey=prevDate.getFullYear()+"-"+String(prevDate.getMonth()+1).padStart(2,"0");
+  const prevRows=data.expenses.filter(x=>(x.date||"").startsWith(prevKey));
+  const prevTotal=prevRows.reduce((s,x)=>s+(Number(x.amount)||0),0);
+
+  const categoryTotals={};
+  rows.forEach(x=>{
+   const cat=x.cat||"その他";
+   categoryTotals[cat]=(categoryTotals[cat]||0)+(Number(x.amount)||0);
+  });
+
+  const categories=Object.entries(categoryTotals)
+   .sort((a,b)=>b[1]-a[1])
+   .map(([name,amount])=>`${name}：${amount}円`)
+   .join("、");
+
+  const incomes=data.incomes.filter(x=>(x.date||"").startsWith(selected));
+  const incomeTotal=incomes.reduce((s,x)=>s+(Number(x.amount)||0),0);
+
+  const question=`
+あなたは家計管理の専門AIです。
+以下の家計データを分析してください。
+
+対象月：${selected}
+今月の支出合計：${total}円
+前月の支出合計：${prevTotal}円
+今月の収入合計：${incomeTotal}円
+カテゴリ別支出：${categories||"支出データなし"}
+
+次の形式で日本語で回答してください。
+
+スコア：数字だけの点数（100点満点）
+
+【家計の総合評価】
+【良いところ】
+【気になる支出】
+【改善したいポイント】
+【来月の貯金目標】
+【AIからのアドバイス】
+
+具体的な金額を使い、無理のない現実的な提案をしてください。
+データが足りない場合は推測せず、そのことを伝えてください。
+`;
+
+  const {data:sessionData}=await sb.auth.getSession();
+  const accessToken=sessionData.session?.access_token;
+
+  if(!accessToken){
+   throw new Error("ログイン情報を取得できませんでした。");
+  }
+
+  const response=await fetch(
+   SUPABASE_URL+"/functions/v1/gemini-adcice",
+   {
+    method:"POST",
+    headers:{
+     "Content-Type":"application/json",
+     "Authorization":"Bearer "+accessToken,
+     "apikey":SUPABASE_ANON_KEY
+    },
+    body:JSON.stringify({question})
+   }
+  );
+
+  const result=await response.json();
+
+  if(!response.ok){
+   throw new Error(result.error||result.message||"AIとの通信に失敗しました。");
+  }
+
+  const answer=result.answer||result.advice||result.text||
+   result.candidates?.[0]?.content?.parts?.map(p=>p.text||"").join("\n");
+
+  if(!answer){
+   throw new Error("AIの回答を取得できませんでした。");
+  }
+
+  const scoreMatch=answer.match(/スコア[：:]\s*(\d{1,3})\s*点?/);
+
+  if(scoreMatch){
+   const score=Math.min(100,Number(scoreMatch[1]));
+   $("diagnosisScore").textContent=score+"点";
+   $("diagnosisGrade").textContent=
+    score>=90?"とても良好":
+    score>=75?"良好":
+    score>=60?"改善の余地あり":"見直しが必要";
+  }else{
+   $("diagnosisScore").textContent="--点";
+   $("diagnosisGrade").textContent="診断完了";
+  }
+
+  output.textContent=answer;
+
+ }catch(error){
+  console.error("AI diagnosis error:",error);
+  output.textContent="診断エラー："+error.message;
+  $("diagnosisScore").textContent="--点";
+  $("diagnosisGrade").textContent="診断できませんでした";
+ }finally{
+  button.disabled=false;
+  button.textContent="🧠 AI家計診断を開始する";
+ }
 }
 
 function render(){
