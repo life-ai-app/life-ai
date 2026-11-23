@@ -112,7 +112,14 @@ button.primary{font-weight:700}
 
   <div style="background:#f8f6ff;padding:15px;border-radius:12px;margin-top:12px">
     <div class="muted">📅 月末の予測収支</div>
-    <div id="forecastBalance" style="font-size:23px;font-weight:bold">0円</div>
+    <div style="background:#f3efff;padding:16px;border-radius:12px;margin-top:12px">
+  <div class="muted">💰 今月使える残りのお金</div>
+  <div id="remainingBudget" style="font-size:28px;font-weight:800;color:#7057e8">0円</div>
+  <div id="homeBudgetRate" class="muted">予算未設定</div>
+  <div style="height:12px;background:#ddd;border-radius:20px;overflow:hidden;margin-top:10px">
+    <div id="homeBudgetBar" style="height:100%;width:0%;background:#7057e8;border-radius:20px"></div>
+  </div>
+</div>
     <p class="muted" style="margin-bottom:0">今月の収入と、現在までの支出ペースから予測します。</p>
   </div>
 </div>
@@ -928,6 +935,23 @@ $("forecastBalance").textContent=yen(Math.round(forecast));
   ?Math.min(100,total/data.budget*100)+"%"
   :"0%";
  $("monthlyBudget").value=data.budget||"";
+ const remaining=data.budget-total;
+const rate=data.budget>0?total/data.budget*100:0;
+
+$("remainingBudget").textContent=data.budget
+ ?yen(remaining)
+ :"予算未設定";
+
+$("homeBudgetRate").textContent=data.budget
+ ?`予算の${Math.round(rate)}%を使用中`
+ :"予算を設定すると表示されます";
+
+$("homeBudgetBar").style.width=
+ data.budget?Math.min(100,rate)+"%":"0%";
+
+$("homeBudgetBar").style.background=
+ rate>=100?"#dc2626":
+ rate>=80?"#d97706":"#16a34a";
 
  const sums={};
  ex.forEach(x=>{
