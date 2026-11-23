@@ -143,8 +143,37 @@ button.primary{font-weight:700}
 <h2>カテゴリ別の内訳</h2>
 <div id="reportCategories"></div>
 </div>
+
 <div class="card">
-<h2>直近6か月の支出推移</h2>
+  <h2>直近6か月の支出推移</h2>
+  <div id="reportTrend"></div>
+</div>
+
+<div class="card">
+  <h2>🧠 AI家計診断</h2>
+  <p class="muted">AIがあなたの家計を詳しく分析します。</p>
+
+  <div style="background:#f3efff;padding:16px;border-radius:14px;margin:12px 0;text-align:center">
+    <div class="muted">今月の家計診断</div>
+    <div style="font-size:13px;color:#7057e8;font-weight:bold">LIFE AI ANALYSIS</div>
+    <div id="diagnosisScore" style="font-size:42px;font-weight:800;color:#7057e8">--点</div>
+    <div id="diagnosisGrade" style="font-weight:bold">診断前</div>
+  </div>
+
+  <h3>📊 AIからの診断結果</h3>
+  <div id="savingAdvice" style="white-space:pre-wrap;line-height:1.8">
+    診断ボタンを押すと、AIが家計を分析します。
+  </div>
+
+  <button class="primary" id="diagnosisButton"
+    style="width:100%;margin-top:15px"
+    onclick="runDiagnosis()">
+    🧠 AI家計診断を開始する
+  </button>
+
+  <p class="muted">※診断結果は登録された支出データをもとにした参考情報です。</p>
+</div>
+
 <div id="reportTrend"></div>
 <div class="card">
  <h2>💡 節約アドバイス</h2>
