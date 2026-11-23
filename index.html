@@ -947,7 +947,8 @@ sb.auth.getSession().then(({data:d})=>{
  }
 });
  async function checkPremium() {
-  if (!user) return;
+  $("premiumStatus").textContent = "① プレミアム確認を開始";
+if (!user) return;
 
   const { data: sub, error } = await sb
     .from("subscriptions")
