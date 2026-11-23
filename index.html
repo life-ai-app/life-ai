@@ -907,9 +907,9 @@ const entries = Object.entries(sums)
  .filter(([k,v]) => v > 0)
  .sort((a,b) => b[1] - a[1]);
 
-const total = entries.reduce((s,[k,v]) => s + v, 0);
+const categoryTotal = entries.reduce((s,[k,v]) => s + v, 0);
 
-if (!total) {
+if (!categoryTotal) {
  $("categories").innerHTML = "まだ支出がないよ";
 } else {
  const colors = [
@@ -921,7 +921,7 @@ if (!total) {
  let current = 0;
  const gradient = entries.map(([k,v],i) => {
   const start = current;
-  current += v / total * 100;
+  current += v / categoryTotal * 100;
   return `${colors[i % colors.length]} ${start}% ${current}%`;
  }).join(",");
 
@@ -929,7 +929,7 @@ if (!total) {
   <div style="text-align:center;margin:15px 0">
    <div style="font-size:13px;color:#888">今月の支出合計</div>
    <div style="font-size:26px;font-weight:800;color:#7057e8">
-    ${yen(total)}
+    ${yen(categoryTotal)}
    </div>
    <div style="width:190px;height:190px;border-radius:50%;
     background:conic-gradient(${gradient});
@@ -939,7 +939,7 @@ if (!total) {
    </div>
   </div>
   ${entries.map(([k,v],i) => {
-   const rate = v / total * 100;
+   const rate = v / categoryTotal * 100;
    return `
     <div style="margin:14px 0">
      <div class="item">
