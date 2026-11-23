@@ -955,6 +955,8 @@ sb.auth.getSession().then(({data:d})=>{
     .eq("user_id", user.id)
     .maybeSingle();
 
+console.log("会員情報取得結果:", sub, error);
+
   if (error) {
     $("premiumStatus").textContent = "会員状態を確認できませんでした";
     return;
