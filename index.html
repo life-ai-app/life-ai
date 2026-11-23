@@ -77,26 +77,32 @@ button.primary{font-weight:700}
 </nav>
 
 <div id="home" class="tab">
-<div class="card">
-<h2>💰 今月の収支・月末予測</h2>
-<div class="item">
-<span>今月の収入</span>
-<b id="incomeTotal">0円</b>
+
+<div class="card" style="padding:20px">
+  <h2>💰 今月のお金の状況</h2>
+
+  <div style="background:#f3efff;padding:18px;border-radius:14px;margin:12px 0">
+    <div class="muted">今月の収支</div>
+    <div id="currentBalance" style="font-size:30px;font-weight:800;color:#7057e8">0円</div>
+  </div>
+
+  <div class="item">
+    <span>💵 今月の収入</span>
+    <b id="incomeTotal">0円</b>
+  </div>
+
+  <div class="item">
+    <span>💸 今月の支出</span>
+    <b id="expenseTotal">0円</b>
+  </div>
+
+  <div style="background:#f8f6ff;padding:15px;border-radius:12px;margin-top:12px">
+    <div class="muted">📅 月末の予測収支</div>
+    <div id="forecastBalance" style="font-size:23px;font-weight:bold">0円</div>
+    <p class="muted" style="margin-bottom:0">今月の収入と、現在までの支出ペースから予測します。</p>
+  </div>
 </div>
-<div class="item">
-<span>今月の支出</span>
-<b id="expenseTotal">0円</b>
-</div>
-<div class="item">
-<span>現在の収支</span>
-<b id="currentBalance">0円</b>
-</div>
-<div class="item">
-<span>月末の予測収支</span>
-<b id="forecastBalance">0円</b>
-</div>
-<p class="muted">今月の収入と、現在までの支出ペースから予測します。</p>
-</div>
+
  <div class="card">
 <h2>今月のカテゴリ別支出</h2>
 <div id="categories"></div>
