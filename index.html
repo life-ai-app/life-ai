@@ -37,6 +37,15 @@ button.primary{font-weight:700}
 .notice{padding:10px;background:#fff7df;border-radius:10px;font-size:13px}
 .premium{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:white;text-align:center}
 .premium button{background:white;color:#8b5cf6;font-weight:bold}
+.premium button{background:white;color:#8b5cf6;font-weight:bold}
+.landing{text-align:center}
+.hero{background:linear-gradient(135deg,#7057e8,#a36bea);color:white;padding:30px 20px;border-radius:20px;margin:15px 0}
+.hero h2{font-size:25px;line-height:1.5}
+.hero p{line-height:1.8}
+.start-btn{background:white;color:#7057e8;font-weight:bold;width:100%;font-size:17px;padding:16px;margin-top:12px}
+.feature{text-align:left;padding:16px;background:#f8f6ff;border-radius:14px;margin:10px 0}
+.feature b{color:#7057e8}
+.login-link{background:transparent;color:#7057e8;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -47,7 +56,33 @@ button.primary{font-weight:700}
 </header>
 
 <main>
-<section id="auth" class="card">
+
+<section id="landing" class="landing">
+  <div class="hero">
+    <h2>毎日のお金の管理を、もっと簡単に。</h2>
+    <p>LIFE AIなら、支出・予算・貯金目標をまとめて管理できます。</p>
+    <button class="start-btn" onclick="showAuth()">無料で始める</button>
+  </div>
+
+  <div class="card">
+    <h2>🌈 LIFE AIでできること</h2>
+    <div class="feature">💰 <b>支出管理</b><br>毎日の出費を簡単に記録</div>
+    <div class="feature">📊 <b>月間レポート</b><br>お金の流れをグラフで確認</div>
+    <div class="feature">🎯 <b>貯金目標</b><br>目標を決めて貯金をサポート</div>
+    <div class="feature">✨ <b>節約アドバイス</b><br>無駄遣いを見直すヒント</div>
+  </div>
+
+  <div class="card premium">
+    <h2>プレミアムプラン</h2>
+    <p>月額300円で、さらに便利に。</p>
+    <p>年間収支分析・複数の貯金目標など</p>
+  </div>
+
+  <button class="start-btn" onclick="showAuth()">無料で始める</button>
+  <button class="login-link" onclick="showAuth()">ログインはこちら</button>
+</section>
+
+<section id="auth" class="card hidden">
 <h2>ログイン / 新規登録</h2>
 <p class="muted">メールアドレスとパスワードでデータを保存します。</p>
 <input id="email" type="email" placeholder="メールアドレス">
@@ -390,6 +425,10 @@ async function signIn(){
  if(error){msg(error.message);return}
  user=d.user;
  await loadData();
+}
+ function showAuth(){
+ document.getElementById("landing").classList.add("hidden");
+ document.getElementById("auth").classList.remove("hidden");
 }
 
 async function signOut(){
